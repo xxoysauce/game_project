@@ -8,11 +8,11 @@ public class NPCInteract : MonoBehaviour
     public Transform playerOverride;
     Transform player;
 
-    // 👇 여기부터 NPC 개별 설정
+
     [Header("NPC 설정")]
-    public string npcName = "토끼님";     // 화면에 찍힐 이름
+    public string npcName = "토끼님";    
     [TextArea(3, 6)]
-    public string npcPersona = "당신은 따뜻한 마을 촌장입니다.";  // LLM에 넣을 system 프롬프트 조각
+    public string npcPersona = "당신은 따뜻한 마을 촌장입니다."; 
 
     void Start()
     {
@@ -35,16 +35,19 @@ public class NPCInteract : MonoBehaviour
 
         if (planarDist <= interactDistance)
         {
-            // E로 대화 시작
+
+
             if (Input.GetKeyDown(KeyCode.E) && apiConnector != null && !apiConnector.IsDialogueActive)
             {
-                // ⭐️ 이 NPC의 프로필을 먼저 알려준다
+ 
+ 
                 apiConnector.SetNpcProfile(npcName, npcPersona);
 
                 apiConnector.StartDialogue();
             }
 
-            // Enter로 첫 턴
+
+
             if (Input.GetKeyDown(KeyCode.Return) && apiConnector != null && apiConnector.IsDialogueActive)
             {
                 if (apiConnector.awaitingUserSelection)

@@ -5,8 +5,8 @@ using UnityEngine.AI;
 public class NPCWander : MonoBehaviour
 {
     [Header("Wander Settings")]
-    public float roamRadius = 20f;        // 이동 반경
-    public float stepMinDistance = 3.0f;  // 최소 이동 거리
+    public float roamRadius = 20f;        
+    public float stepMinDistance = 3.0f; 
     public float idleMin = 0.6f, idleMax = 1.5f;
 
     private NavMeshAgent agent;
@@ -14,7 +14,6 @@ public class NPCWander : MonoBehaviour
     private float nextTime;
     private float stuckTimer;
 
-    // 🟡 추가: OpenAIConnector 참조
     private OpenAIConnector connector;
 
     void Awake()
@@ -25,7 +24,7 @@ public class NPCWander : MonoBehaviour
         agent.autoBraking = false;
         roamCenter = transform.position;
 
-        // 🟡 자동으로 씬 내의 OpenAIConnector를 찾음
+
         connector = FindObjectOfType<OpenAIConnector>();
     }
 
@@ -39,7 +38,7 @@ public class NPCWander : MonoBehaviour
     {
         if (!agent.enabled || !agent.isOnNavMesh) return;
 
-        // 🟡 대화 중이면 NPC 멈추기
+
         if (connector != null && connector.IsDialogueActive)
         {
             if (!agent.isStopped)
@@ -47,14 +46,14 @@ public class NPCWander : MonoBehaviour
                 agent.isStopped = true;
                 agent.velocity = Vector3.zero;
             }
-            return; // 대화 중에는 이동 로직 실행 안 함
+            return; 
         }
         else if (agent.isStopped)
         {
             agent.isStopped = false;
         }
 
-        // 이하 기본 wander 로직
+
         if (agent.velocity.sqrMagnitude < 0.01f)
             stuckTimer += Time.deltaTime;
         else

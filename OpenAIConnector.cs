@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-// ⭐️ 파일 이름: OpenAIConnector.cs
 public class OpenAIConnector : MonoBehaviour
 {
     private const string OpenAIApiUrl = "https://api.openai.com/v1/chat/completions";
@@ -14,12 +13,9 @@ public class OpenAIConnector : MonoBehaviour
     [Header("OpenAI API 설정")]
     [SerializeField] private OpenAIConfig config;
 
-    // 대화 히스토리
+
     private List<ChatMessage> conversationHistory = new List<ChatMessage>();
 
-    // ----------------------------------------------------------------------
-    // UI
-    // ----------------------------------------------------------------------
     [Header("UI 및 게임 설정")]
     public TextMeshProUGUI responseText;
     public GameObject optionButtonsContainer;
@@ -33,14 +29,12 @@ public class OpenAIConnector : MonoBehaviour
     public ButtonHandler optionAButton;
     public ButtonHandler optionBButton;
 
-    // 상태
+
     public bool IsDialogueActive { get; private set; } = false;
     [HideInInspector] public bool awaitingUserSelection = false;
     [HideInInspector] public bool isTyping = false;
 
-    // ----------------------------------------------------------------------
-    // NPC / 플레이어 프로필
-    // ----------------------------------------------------------------------
+
     private string currentNpcName = "";
     private string currentNpcPersona =
         "";
@@ -65,9 +59,7 @@ public class OpenAIConnector : MonoBehaviour
         "플레이어는 밝고 귀엽고, 말을 짧게 끝내는 스타일입니다. 반말을 사용합니다. 퀘스트가 들어올 시에는 '응 좋아!', '아니 다음에 할래..' 같은 긍/부정의 대답만 합니다. 퀘스트(사과를 주워줘, 과자를 주워줘 와 같은 퀘스트)가 아닌 일반 대화에서는 대화가 자연스럽게 이어질 만한 대답을 만듭니다. 퀘스트가 아닌 일반 대화에서는 긍부정의 말을 최대한 사용하지마시, 퀘스트 시에만 사용하세요.  그 외의 대화에 대해서는 NPC들의 말을 공감해주는 형태의 대답을 뱉습니다. 넌센스 퀴즈나 퀴즈 형태의 질문이 들어오면 정답 혹은 오답을 대답합니다."
         + "플레이어의 맣투는 구어체여야 하며 단답식으로 끝나는 대답은 지양합니다.대화가 자연스럽게 이어지도록 구어체만을 사용합니다.";
 
-    // ----------------------------------------------------------------------
-    // 플레이어 랜덤 첫 대사
-    // ----------------------------------------------------------------------
+
     private readonly string[] playerOpeningLines = new string[]
     {
         "안녕. 여기에 처음 이사 왔어.",
@@ -80,14 +72,12 @@ public class OpenAIConnector : MonoBehaviour
     private string lastPlayerOpeningLine = "";
     private int lastPlayerLineIndex = -1;
 
-    // LLM 응답 저장
+
     private string currentNpc = "";
     private string currentOptionA = "";
     private string currentOptionB = "";
 
-    // ----------------------------------------------------------------------
-    // 직렬화용
-    // ----------------------------------------------------------------------
+
     [Serializable] public class ChatMessage { public string role; public string content; }
 
     [Serializable]
@@ -112,25 +102,19 @@ public class OpenAIConnector : MonoBehaviour
         public string option_b;
     }
 
-    // ----------------------------------------------------------------------
-    // 타이핑
-    // ----------------------------------------------------------------------
+
     [Header("타이핑 효과 설정")]
     public bool useTypewriter = true;
     public float charsPerSecond = 65f;
     private Coroutine typingCoroutine;
 
-    // ======================================================================
-    // Unity
-    // ======================================================================
+
     void Start()
     {
         EndDialogue();
     }
 
-    // ======================================================================
-    // 외부에서 NPC 프로필 세팅
-    // ======================================================================
+
     public void SetNpcProfile(string npcName, string npcPersona)
     {
         if (!string.IsNullOrEmpty(npcName))
@@ -144,9 +128,7 @@ public class OpenAIConnector : MonoBehaviour
             currentNpcPersona = "당신은 이 마을의 친절한 NPC입니다.";
     }
 
-    // ======================================================================
-    // 대화 시작
-    // ======================================================================
+
     public void StartDialogue()
     {
         if (IsDialogueActive) return;
@@ -157,7 +139,7 @@ public class OpenAIConnector : MonoBehaviour
             return;
         }
 
-        // 1) 먼저 퀘스트 완료 체크
+
         if (QuestManager.Instance != null && QuestManager.Instance.IsQuestComplete())
         {
             IsDialogueActive = true;
@@ -190,14 +172,14 @@ public class OpenAIConnector : MonoBehaviour
             return;
         }
 
-        // 2) 일반 대화 시작
+
         conversationHistory.Clear();
         conversationHistory.Add(new ChatMessage
         {
             role = "system",
             content = string.IsNullOrEmpty(currentNpcPersona)
-                ? BuildDefaultSystemPrompt() // 인스펙터가 비어 있으면 기본 프롬프트 사용
-                : currentNpcPersona + " " +  // 인스펙터 프롬프트 우선
+                ? BuildDefaultSystemPrompt() 
+                : currentNpcPersona + " " +  
                     "플레이어의 말투를 존중해서 대화를 이어가세요. " +
                     "플레이어의 말투는 선택지로 제공되는 것을 의미합니다. 플레이어의 성격은 다음과 같습니다: " + playerPersona + "\n\n" +
                     "플레이어의 말을 들은 뒤 1~3문장으로 대답하고, 그 상황에 맞는 2개의 짧은 한국어 선택지를 제공합니다. 이 2개의 선택지는 반드시 플레이어 입장에서의 대답이어야 하며, NPC 입장에서의 발화는 절대 포함하지 마세요.\n\n" +
@@ -214,7 +196,7 @@ public class OpenAIConnector : MonoBehaviour
         dialoguePanel?.SetActive(true);
         optionButtonsContainer?.SetActive(false);
 
-        // 플레이어 첫 대사
+
         lastPlayerOpeningLine = GetRandomPlayerLine();
         if (nameText != null) nameText.text = "다람쥐";
 
@@ -230,7 +212,7 @@ public class OpenAIConnector : MonoBehaviour
         awaitingUserSelection = true;
     }
 
-    // 랜덤 첫 대사
+
     private string GetRandomPlayerLine()
     {
         if (playerOpeningLines == null || playerOpeningLines.Length == 0)
@@ -250,7 +232,7 @@ public class OpenAIConnector : MonoBehaviour
         return playerOpeningLines[idx];
     }
 
-    // 대화 종료
+
     public void EndDialogue()
     {
         IsDialogueActive = false;
@@ -275,21 +257,19 @@ public class OpenAIConnector : MonoBehaviour
         conversationHistory.Add(new ChatMessage { role = role, content = content });
     }
 
-    // ----------------------------------------------------------------------
-    // 버튼에서 선택됐을 때
-    // ----------------------------------------------------------------------
+
     public void OnOptionSelected(string selectedOption)
     {
         Debug.Log($"[OpenAIConnector] 옵션 선택 감지: {selectedOption}");
 
-        // 히스토리
+
         AddMessageToHistory("user", selectedOption);
 
-        // 플레이어 이름 찍기
+        
         if (nameText != null)
             nameText.text = "다람쥐";
 
-        // 플레이어가 고른 것도 한 번 화면에 보여주기
+        
         if (responseText != null)
         {
             if (typingCoroutine != null) StopCoroutine(typingCoroutine);
@@ -299,7 +279,7 @@ public class OpenAIConnector : MonoBehaviour
                 responseText.text = selectedOption;
         }
 
-        // 수락/거절 패턴
+
         string lower = selectedOption.ToLower();
 
         bool accept =
@@ -331,14 +311,12 @@ public class OpenAIConnector : MonoBehaviour
             return;
         }
 
-        // 일반 대화면 다음 턴
+
         optionButtonsContainer?.SetActive(false);
         SendRequestToOpenAI(selectedOption);
     }
 
-    // ----------------------------------------------------------------------
-    // LLM 요청
-    // ----------------------------------------------------------------------
+
     public void SendRequestToOpenAI(string playerSelection)
     {
         if (config == null || string.IsNullOrEmpty(config.apiKey))
@@ -426,9 +404,7 @@ public class OpenAIConnector : MonoBehaviour
         return jsonResponse;
     }
 
-    // ----------------------------------------------------------------------
-    // LLM 응답을 실제 UI에 반영
-    // ----------------------------------------------------------------------
+
     private void ApplyTurn(string content)
     {
         LlmTurn turn = null;
@@ -447,7 +423,7 @@ public class OpenAIConnector : MonoBehaviour
             currentOptionB = string.IsNullOrEmpty(turn.option_b) ? "아니" : turn.option_b;
         }
 
-        // 🎯 이 대사가 실제 퀘스트 요청인지 검사 (사과/바나나/배/센베만)
+
         TryDetectLimitedQuest(currentNpc);
 
         if (nameText != null) nameText.text = currentNpcName;
@@ -471,9 +447,7 @@ public class OpenAIConnector : MonoBehaviour
         optionButtonsContainer?.SetActive(true);
     }
 
-    // ----------------------------------------------------------------------
-    // 우리 게임에 있는 4종만 퀘스트로 인정
-    // ----------------------------------------------------------------------
+
     private void TryDetectLimitedQuest(string npcLine)
     {
         if (QuestManager.Instance == null) return;
@@ -499,9 +473,6 @@ public class OpenAIConnector : MonoBehaviour
             QuestManager.Instance.RegisterQuest("배", 3);
     }
 
-    // ----------------------------------------------------------------------
-    // 타이핑 코루틴
-    // ----------------------------------------------------------------------
     private IEnumerator TypewriterEffect(string fullText)
     {
         isTyping = true;
@@ -524,9 +495,7 @@ public class OpenAIConnector : MonoBehaviour
         isTyping = false;
     }
 
-    // ----------------------------------------------------------------------
-    // 입력
-    // ----------------------------------------------------------------------
+
     void Update()
     {
         if (!IsDialogueActive) return;
@@ -565,9 +534,7 @@ public class OpenAIConnector : MonoBehaviour
         awaitingUserSelection = false;
     }
 
-    // ----------------------------------------------------------------------
-    // 선물 주기 (Z/X에서 호출)
-    // ----------------------------------------------------------------------
+
     public void OnGiftGiven(string itemName, bool liked = true)
     {
         if (config == null || string.IsNullOrEmpty(config.apiKey))

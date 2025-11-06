@@ -10,8 +10,8 @@ public class CameraAutoMove : MonoBehaviour
     public AnimationCurve moveCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     [Header("씬 전환")]
-    public string nextSceneName = "IslandScene"; // 이동할 씬 이름
-    public float delayAfterMove = 1.5f; // 이동 후 약간의 대기 시간
+    public string nextSceneName = "IslandScene"; 
+    public float delayAfterMove = 1.5f; 
 
     private float t = 0f;
     private bool hasLoaded = false;

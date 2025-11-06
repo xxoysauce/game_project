@@ -1,16 +1,12 @@
 using UnityEngine;
 
 /// <summary>
-/// 부드러운 3인칭 추적 카메라
-/// - 월드 스케일 대응 (worldScale 배수로 한 번에 보정)
-/// - 충돌 보정 시 최소거리 보장 (급줌-인 방지)
-/// - 우클릭 궤도 회전(옵션), 휠 줌(옵션)
-/// - 플레이어 진행 방향을 향하도록 자동 정렬(옵션)
+
 /// </summary>
 public class FollowCam : MonoBehaviour
 {
     [Header("Target")]
-    public Transform target;                            // 비어있으면 Player 태그 자동 검색
+    public Transform target;                           
     [Tooltip("장면이 x배로 커졌다면 여기에도 같은 배수를 넣으세요 (예: 100)")]
     public float worldScale = 1f;
 
@@ -44,7 +40,7 @@ public class FollowCam : MonoBehaviour
     public float headingLerp = 6f;
 
     [Header("Collision")]
-    public LayerMask collisionMask;                     // 비어 있으면 전부(~0)
+    public LayerMask collisionMask;            
     [Tooltip("카메라 충돌 캡슐 반경(스케일과 함께 보정됩니다)")]
     public float collisionRadius = 0.2f;
     [Tooltip("충돌 표면에서 얼마나 더 띄울지(안 파고들게)")]
@@ -63,7 +59,7 @@ public class FollowCam : MonoBehaviour
             if (t) target = t.transform;
         }
 
-        // 월드 스케일 반영 (한 번만) —— 숫자 튜닝이 훨씬 쉬워져요
+ 
         if (Mathf.Abs(worldScale - 1f) > 0.001f)
         {
             distance *= worldScale;
@@ -103,17 +99,17 @@ public class FollowCam : MonoBehaviour
             distance = Mathf.Clamp(distance, minDistance, maxDistance);
         }
 
-        // 우클릭 궤도 회전
+
         if (allowOrbit && Input.GetMouseButton(1))
         {
             yaw += Input.GetAxis("Mouse X") * orbitSpeed * Time.deltaTime;
             pitch -= Input.GetAxis("Mouse Y") * (orbitSpeed * 0.6f) * Time.deltaTime;
             pitch = Mathf.Clamp(pitch, _minPitch, _maxPitch);
         }
-        // 진행 방향 정렬
+
         else if (alignToTargetHeading)
         {
-            Vector3 fwd = target.forward;  // XZ 평면에 투영
+            Vector3 fwd = target.forward; 
             fwd.y = 0f;
             if (fwd.sqrMagnitude > 0.0001f)
             {
@@ -129,14 +125,14 @@ public class FollowCam : MonoBehaviour
 
         _curDistance = Mathf.Lerp(_curDistance, distance, Time.deltaTime * 8f);
 
-        // 기준 점(시선 시작점)
+
         Vector3 from = target.position + lookOffset;
 
-        // 원하는 위치 계산
+   
         Quaternion rot = Quaternion.Euler(pitch, yaw, 0f);
         Vector3 desiredPos = from + rot * (Vector3.back * _curDistance);
 
-        // 충돌 보정
+
         Vector3 dir = desiredPos - from;
         float dist = dir.magnitude;
         if (dist > 0.0001f)
@@ -148,7 +144,7 @@ public class FollowCam : MonoBehaviour
 
             if (Physics.SphereCast(from, collisionRadius, dir, out RaycastHit hit, dist, mask))
             {
-                // 표면보다 살짝 앞에서 멈춤 + 최소거리 보장 (급줌-인 방지)
+
                 float hitDist = Mathf.Max(hit.distance - collisionSurfacePadding, minDistance);
                 safe = Mathf.Min(safe, hitDist);
             }
@@ -156,7 +152,7 @@ public class FollowCam : MonoBehaviour
             desiredPos = from + dir * safe;
         }
 
-        // 이동/회전 보간
+
         transform.position = Vector3.Lerp(transform.position, desiredPos, Time.deltaTime * followLerp);
 
         Vector3 lookDir = (from - transform.position);
