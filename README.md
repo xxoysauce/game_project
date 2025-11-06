@@ -136,6 +136,7 @@ NPC가 플레이어의 이전 질문이나 선택을 잊지 않도록, 모든 AP
  - 플레이어 구동 및 NPC AI manegement 사용해 자유 이동
 
 <p align="center"><img width="1439" height="757" alt="스크린샷 2025-11-06 14 41 57" src="https://github.com/user-attachments/assets/4f01014f-3966-4214-8bee-6724482cbcc6" /></p>
+
 - 바닥에 떨어져 있는 사과 프리펩들
 
 
