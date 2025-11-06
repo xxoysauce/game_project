@@ -2,6 +2,9 @@
 
 
 ## 😈 문제 상황
+
+<p align="center"><img width="868" height="874" alt="KakaoTalk_Photo_2025-11-06-20-43-38" src="https://github.com/user-attachments/assets/be4bf3d2-471e-4aec-9c14-91b60d788292" /></p>
+
 - 덮어쓰기: 유니티는 Assets 폴더 내 C# 파일이 바뀌면 자동으로 컴파일을 시도하지만, 덮어쓰기 과정에서 컴파일 캐시 (Library 폴더) 자체가 꼬여버림.
 
 - 복구 불가: Library 폴더나 씬 파일 내부의 연결 데이터는 수동으로 YAML 파일을 열어 UID를 맞추지 않는 한 복구가 거의 불가능
@@ -40,16 +43,16 @@ NPC 단순한 스크립트 재생을 넘어, 대화 히스토리, 퀘스트 상�
 IslandScene
 ├─ Main Camera
 ├─ Directional Light
-├─ village scene              ← 배경/지형 프리팹
+├─ village scene             
 ├─ Player
 ├─ NPC1_Happy
 ├─ NPC2_Crying
 ├─ NPC3_Happy
 ├─ NPC4_Crying
 ├─ NPC5_Idle
-├─ NavMeshRoot                ← NavMesh Surface 있는 오브젝트
+├─ NavMeshRoot                
 ├─ Canvas
-│  └─ talkPanel               ← 여기서 실제 대화 UI 나옴
+│  └─ talkPanel               
 │      ├─ NameText
 │      ├─ BodyText
 │      └─ Buttons
@@ -58,14 +61,13 @@ IslandScene
 │         │   └─ Text (TMP)
 │         └─ OptionB
 │             └─ Text (TMP)
-├─ DialogueSystem             ← DialogueManager 붙어 있는 오브젝트였을 때 이름
-└─ ApiManager                 ← OpenAIConnector 붙여둔 빈 오브젝트
+├─ DialogueSystem             
+└─ ApiManager               
  ```
 
 
 ## 💡 핵심 아키텍처 및 LLM 연동 전략
 
-본 프로젝트의 가장 큰 기술적 성과는 LLM을 단순한 챗봇이 아닌, 게임 내 액션과 로직을 결정하는 엔진으로 활용한 점입니다.
 
 **1. JSON Schema 기반 구조화된 응답 강제** 
 
@@ -97,14 +99,67 @@ OpenAIConnector는 API를 호출하기 직전, QuestManager의 데이터를 읽�
 NPC가 플레이어의 이전 질문이나 선택을 잊지 않도록, 모든 API 호출 시 conversationHistory 리스트의 내용을 통째로 전송하여 LLM의 **'기억(Context Window)'** 을 유지했습니다.
 
 
-## 구현 기능
+
+
+## 🏠구현 기능
+
+- NPC — NPCWander로 자유롭게 이동
+
+- 대화 시 NPC / 플레이어 정지
+
+- 플레이어 방향키로 이동
+
+- 사과 프리펩과 충돌 시 +1 / NPC 퀘스트 완료 시 긍정의 말 출력
+
+- E키 접근 시 대화창 등장 / Q키 선택 시 대화창 종료 및 작별인사 출력
+
+- NPC 대사 → 다음 버튼 → 선택지 표시(이지선다)
+
+- 선택 시 OpenAI 응답 표시 (LLM 대화 연결)
+
+- 시간의 흐름에 따라 바뀌는 SKYBOX 적용
+
+- NPC마다 다른 프롬프팅으로 퀘스트를 많이 주는 NPC, 상담을 요청하는 NPC, 퀴즈를 내는 NPC 등으로 구성
+
+
+----
+### 🌳구현 화면
+
+<p align="center"><img width="1440" height="755" alt="스크린샷 2025-11-06 14 40 15" src="https://github.com/user-attachments/assets/f148f993-54c2-46d1-a86b-33f9655c1b47" /></p>
+
+<p align="center"><img width="1438" height="742" alt="스크린샷 2025-11-06 14 41 23" src="https://github.com/user-attachments/assets/9cff98cb-0970-4a9f-bdc9-da83e43917f4" /></p>
+
+- 시작씬
+
+<p align="center"><img width="1440" height="747" alt="스크린샷 2025-11-06 14 41 39" src="https://github.com/user-attachments/assets/995a13ea-776a-435f-88d7-8d95907ce1b4" /></p>
+
+ - 플레이어 구동 및 NPC AI manegement 사용해 자유 이동
+
+<p align="center"><img width="1439" height="757" alt="스크린샷 2025-11-06 14 41 57" src="https://github.com/user-attachments/assets/4f01014f-3966-4214-8bee-6724482cbcc6" /></p>
+- 바닥에 떨어져 있는 사과 프리펩들
+
+
+<p align="center"><img width="689" height="656" alt="quest" src="https://github.com/user-attachments/assets/67ff00a9-cadd-4a75-b905-33f89a478bfc" /></p>
+
+- 퀘스트 로그
+
+  
+<p align="center"><img width="1282" height="515" alt="스크린샷 2025-11-06 14 38 07" src="https://github.com/user-attachments/assets/260a1e9b-5794-47b7-88c9-e0174ce03c31" /></p>
+<p align="center"><img width="1265" height="584" alt="스크린샷 2025-11-06 14 38 18" src="https://github.com/user-attachments/assets/5b3770a4-5f3a-4f53-aeeb-c06c739ddb1e" /></p>
+<p align="center"><img width="734" height="464" alt="스크린샷 2025-11-06 15 11 47" src="https://github.com/user-attachments/assets/1379259e-34ff-422c-af35-c6c82936017e" /></p>
+
+- 대화창 및 API 통신 로그
 
 
 
-NPC — NPCWander로 자유롭게 이동
+  <p align="center"><img width="638" height="637" alt="스크린샷 2025-11-06 16 31 50" src="https://github.com/user-attachments/assets/4f84d0c1-a6c6-4255-8c81-16afd82e217a" />></p>
 
-E키 접근 시 대화창 등장
+- 인스펙터 내에서 수정할 수 있는 플레이어의 프롬프트
 
-NPC 대사 → 다음 버튼 → 선택지 표시
+  <p align="center"><img width="570" height="488" alt="스크린샷 2025-11-06 20 26 56" src="https://github.com/user-attachments/assets/ce769c79-447e-42e0-8625-cfdfa5ba2a92" /></p>
 
-선택 시 OpenAI 응답 표시 (LLM 대화 연결)
+- 인스펙터 내에서 수정할 수 있는 각각 NPC 들의 프롬프트
+
+<p align="center"><img width="664" height="268" alt="스크린샷 2025-11-06 15 12 40" src="https://github.com/user-attachments/assets/f4ef0534-9858-42b2-bad4-106b891ec28b" /></p>
+
+- 히스토리 초기화 및 저장
